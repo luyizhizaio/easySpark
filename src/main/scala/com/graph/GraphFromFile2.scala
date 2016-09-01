@@ -6,8 +6,17 @@ import org.apache.spark.{SparkContext, SparkConf}
 
 /**
  * Created by lichangyue on 2016/8/31.
+文件的数据结构
+# Nodes: 875713 Edges: 5105039
+# FromNodeId	ToNodeId
+0	11342
+0	824020
+0	867923
+0	891835
+11342	0
+11342	27469
  */
-object GraphFromFile {
+object GraphFromFile2 {
 
   def main(args: Array[String]) {
     Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
