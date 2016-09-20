@@ -4,7 +4,7 @@ import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.{SparkContext, SparkConf}
 
 /**
- * 使用pregel compute shortest paths
+ * 使用pregel compute shortest paths 最短路劲计算
  * Created by lichangyue on 2016/9/1.
  */
 object GraphPregel9 {
