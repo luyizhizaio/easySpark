@@ -1,6 +1,6 @@
-package com.rdd
+package com.rdd.transforms
 
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * Created by lichangyue on 2016/8/25.

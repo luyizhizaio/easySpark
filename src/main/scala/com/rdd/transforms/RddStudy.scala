@@ -1,6 +1,6 @@
-package com.rdd
+package com.rdd.transforms
 
-import org.apache.spark.{TaskContext, HashPartitioner, SparkConf, SparkContext}
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * Created by lichangyue on 2016/8/19.
