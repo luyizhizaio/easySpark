@@ -1,8 +1,6 @@
-package com.ml
+package com.ml.feature
 
-
-
-
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
 import org.apache.spark.ml.feature.{RegexTokenizer, Tokenizer}
@@ -14,6 +12,11 @@ import org.apache.spark.sql.SQLContext
  */
 object MyTokenizerExample {
   def main(args: Array[String]): Unit = {
+
+
+    Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
+    Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.ERROR);
+
     val conf = new SparkConf().setAppName("TokenizerExample").setMaster("local")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
