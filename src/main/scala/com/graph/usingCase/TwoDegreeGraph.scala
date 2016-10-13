@@ -3,7 +3,7 @@ package com.graph.usingCase
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
 import org.apache.spark.{SparkContext, SparkConf}
-
+import scala.collection.mutable.HashMap
 /**
  * Created by lichangyue on 2016/10/12.
  */
@@ -18,9 +18,13 @@ object TwoDegreeGraph {
     val sc = new SparkContext(conf)
 
 
+   /* val edge=List(//边的信息
+      (111,122),(111,133),(122,133),(133,144),(133,155),(133,166),
+      (144,155),(155,166),(177,188),(177,199),(188,199))*/
+
     val edge=List(//边的信息
-      (1,2),(1,3),(2,3),(3,4),(3,5),(3,6),
-      (4,5),(5,6),(7,8),(7,9),(8,9))
+      (111,122),(111,133),(122,133),(133,144),(133,155),(133,116),
+      (144,155),(155,116),(177,188),(177,199),(188,199))
 
 
     //构建边的rdd
@@ -46,8 +50,6 @@ object TwoDegreeGraph {
     /*使用两次遍历，首先进行初始化的时候将自己的生命值设为2，
      第一次遍历向邻居节点传播自身带的ID以及生命值为1(2-1)的消息，
      第二次遍历的时候收到消息的邻居再转发一次，生命值为0 */
-
-
 
     type VMap=Map[VertexId,Int]
 
@@ -87,16 +89,43 @@ object TwoDegreeGraph {
 
     newG.vertices.collect().foreach(println(_))
     //(4,Map(5 -> 1, 1 -> 0, 6 -> 0, 2 -> 0, 3 -> 1, 4 -> 2))
+//    (1,Map(5 -> 0, 1 -> 2, 6 -> 0, 2 -> 1, 3 -> 1, 4 -> 0))
+//    (6,Map(5 -> 1, 1 -> 0, 6 -> 2, 2 -> 0, 3 -> 1, 4 -> 0))
 
 
-
-    //进行顶点ID,和对应属性id的判断  转成 类型，数量
-    val newG2  = newG.mapVertices((_,attr) =>{
-      attr.size
+    println("--------------------")
+    //进行顶点ID,和对应属性id的判断  转成 类型，数量 , 再过滤
+    val newG2  = newG.mapVertices((id,attr) =>{
+      var map = attr.filter{case (k,v) =>  v == 0 }
+      var tpMap = new HashMap[String,Int];
+      map.keys.foreach(key=> {
+        val tp = key.toString.substring(0,2)
+        tpMap(tp) = tpMap.getOrElse(tp,0) + 1
+      })
+      tpMap
     })
 
 
     newG2.vertices.collect().foreach(println(_))
+//    (122,Map(15 -> 1, 14 -> 1, 11 -> 1))
+//    (116,Map(12 -> 1, 14 -> 1, 11 -> 1))
+//    (111,Map(15 -> 1, 14 -> 1, 11 -> 1))
+//    (188,Map())
+//    (133,Map())
+//    (144,Map(12 -> 1, 11 -> 2))
+//    (199,Map())
+//    (155,Map(12 -> 1, 11 -> 1))
+//    (177,Map())
+
+
+     //过滤14
+    val rdd = newG2.vertices.filter{case(id,attr) => id.toString.substring(0,2).equals("14")}
+      .map(line => {
+      line._1 +","+line._2.getOrElse("11",0)
+    })
+
+    rdd.collect().foreach(println)
+    //144,2
 
   }
 
