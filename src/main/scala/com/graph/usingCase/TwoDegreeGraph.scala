@@ -5,6 +5,7 @@ import org.apache.spark.graphx._
 import org.apache.spark.{SparkContext, SparkConf}
 import scala.collection.mutable.HashMap
 /**
+ * 参考地址：http://kubicode.me/2015/07/07/Spark/Graphs-Applications/#
  * Created by lichangyue on 2016/10/12.
  */
 object TwoDegreeGraph {
