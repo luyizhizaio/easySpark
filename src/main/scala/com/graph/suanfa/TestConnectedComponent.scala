@@ -14,8 +14,6 @@ object TestConnectedComponent {
     Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
     Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.ERROR);
 
-
-
     val conf = new SparkConf()
     val sc = new SparkContext("local","test",conf)
 
@@ -60,7 +58,7 @@ object TestConnectedComponent {
 //    (2,1)
 
 
-    // 取出id为2的顶点的label
+    // 取出id为2的顶点的label (顶点的属性)
 
     val cc_label_of_vid_2:Long = cc.vertices.filter{
       case(id,label) => id ==2
@@ -70,7 +68,7 @@ object TestConnectedComponent {
     println(cc_label_of_vid_2)
     //1
 
-    // 取出相同类标的顶点
+    // 取出相同类标的顶点 ，类标号为1
     val vertices_connected_with_vid_2:RDD[(Long,Long)]= cc.vertices.filter{
       case(id,label) => label == cc_label_of_vid_2
     }

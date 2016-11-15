@@ -24,77 +24,77 @@ object StructOpter {
     // 1,Taro,100
     // 2,Jiro,200
     // 3,Sabo,300
-    val vertexLines :RDD[String] = sc.textFile("hdfs://S7SA053:8020/stat/subgraph-vertices.csv")
+    val vertexLines :RDD[String] = sc.textFile("file/data/graph/subgraph-vertices.csv")
 
     val v: RDD[(VertexId,(String,Long))] = vertexLines.map(line => {
       val cols = line.split(",")
       (cols(0).toLong,(cols(1),cols(2).trim.toLong))
     })
 
-    val format = new SimpleDateFormat("yyyy/MM/dd")
-    // day09-01-edges.csv
-    // 1,2,100,2014/12/1
-    // 2,3,200,2014/12/2
-    // 3,1,300,2014/12/3
-    val edgeLines = sc.textFile("hdfs://S7SA053:8020/stat/subgraph-edges.csv")
+        val format = new SimpleDateFormat("yyyy/MM/dd")
+        // day09-01-edges.csv
+        // 1,2,100,2014/12/1
+        // 2,3,200,2014/12/2
+        // 3,1,300,2014/12/3
+        /* val edgeLines = sc.textFile("hdfs://S7SA053:8020/stat/subgraph-edges.csv")
 
-    val e = edgeLines.map(line=>{
-      val cols =line.split(",")
-      Edge(cols(0).toLong,cols(1).toLong,(cols(2).trim.toLong,format.parse(cols(3).trim)))
-    })
-    //创建图
-    val graph = Graph(v,e)
+         val e = edgeLines.map(line=>{
+           val cols =line.split(",")
+           Edge(cols(0).toLong,cols(1).toLong,(cols(2).trim.toLong,format.parse(cols(3).trim)))
+         })
+         //创建图
+         val graph = Graph(v,e)
 
-    println("\n\nconfirm Vertices Internal of graph")
-    graph.vertices.collect.foreach(println(_))
-//  (1,(Taro,100))
-//  (3,(Sabo,300))
-//  (2,(Jiro,200))
+         println("\n\nconfirm Vertices Internal of graph")
+         graph.vertices.collect.foreach(println(_))
+     //  (1,(Taro,100))
+     //  (3,(Sabo,300))
+     //  (2,(Jiro,200))
 
-    println("\n\nconfirm edge internal of graph")
-    graph.edges.collect.foreach(println(_))
-//    Edge(1,2,(100,Mon Dec 01 00:00:00 CST 2014))
-//    Edge(2,3,(200,Tue Dec 02 00:00:00 CST 2014))
-//    Edge(3,1,(300,Wed Dec 03 00:00:00 CST 2014))
+         println("\n\nconfirm edge internal of graph")
+         graph.edges.collect.foreach(println(_))
+     //    Edge(1,2,(100,Mon Dec 01 00:00:00 CST 2014))
+     //    Edge(2,3,(200,Tue Dec 02 00:00:00 CST 2014))
+     //    Edge(3,1,(300,Wed Dec 03 00:00:00 CST 2014))
 
-    //1.reverse  操作:边的方向改变了
-    println("\n\nconfirm edges reversed graph")
-    graph.reverse.edges.collect.foreach(println)
-//    Edge(1,3,(300,Wed Dec 03 00:00:00 CST 2014))
-//    Edge(2,1,(100,Mon Dec 01 00:00:00 CST 2014))
-//    Edge(3,2,(200,Tue Dec 02 00:00:00 CST 2014))
+         //1.reverse  操作:边的方向改变了
+         println("\n\nconfirm edges reversed graph")
+         graph.reverse.edges.collect.foreach(println)
+     //    Edge(1,3,(300,Wed Dec 03 00:00:00 CST 2014))
+     //    Edge(2,1,(100,Mon Dec 01 00:00:00 CST 2014))
+     //    Edge(3,2,(200,Tue Dec 02 00:00:00 CST 2014))
 
-    /**2.subgraph*/
-    println("\n\nconfirm subgraphed vertices graph ")
-    //根据顶点条件建立子图
-    graph.subgraph(vpred =(vid,v) => v._2 >= 200).vertices.collect.foreach(println(_))
-//    (3,(Sabo,300))
-//    (2,(Jiro,200))
+         /**2.subgraph*/
+         println("\n\nconfirm subgraphed vertices graph ")
+         //根据顶点条件建立子图
+         graph.subgraph(vpred =(vid,v) => v._2 >= 200).vertices.collect.foreach(println(_))
+     //    (3,(Sabo,300))
+     //    (2,(Jiro,200))
 
-    println("\n\n confrim subgraph edges graph")
-    //根据边条件建立子图
-    graph.subgraph(epred =edge => edge.attr._1 >=200).edges.collect.foreach(println(_))
+         println("\n\n confrim subgraph edges graph")
+         //根据边条件建立子图
+         graph.subgraph(epred =edge => edge.attr._1 >=200).edges.collect.foreach(println(_))
 
 
-    //顶点和边同时加限制
-    val subgraph = graph.subgraph(
-      vpred=(vid,v) => v._2 >=200 ,
-      epred =edge => edge.attr._1 >= 200)
+         //顶点和边同时加限制
+         val subgraph = graph.subgraph(
+           vpred=(vid,v) => v._2 >=200 ,
+           epred =edge => edge.attr._1 >= 200)
 
-    println("\n\n顶点和边限制")
-    subgraph.edges.collect.foreach(println(_))
-//    Edge(2,3,(200,Tue Dec 02 00:00:00 CST 2014))
-    //3.mask
-    val maskedgraph = graph.mask(subgraph)
+         println("\n\n顶点和边限制")
+         subgraph.edges.collect.foreach(println(_))
+     //    Edge(2,3,(200,Tue Dec 02 00:00:00 CST 2014))
+         //3.mask
+         val maskedgraph = graph.mask(subgraph)
 
-    println("\nmask 操作")
-    //返回一个子图，两个图的交集
-    maskedgraph.vertices.collect.foreach(println(_))
-//    (3,(Sabo,300))
-//    (2,(Jiro,200))
-    maskedgraph.edges.collect.foreach(println(_))
-//    Edge(2,3,(200,Tue Dec 02 00:00:00 CST 2014))
-
+         println("\nmask 操作")
+         //返回一个子图，两个图的交集
+         maskedgraph.vertices.collect.foreach(println(_))
+     //    (3,(Sabo,300))
+     //    (2,(Jiro,200))
+         maskedgraph.edges.collect.foreach(println(_))
+     //    Edge(2,3,(200,Tue Dec 02 00:00:00 CST 2014))
+     */
     //4.groupEdge
     // day09-02-edges.csv
     // 1,2,100,2014/12/1
@@ -103,7 +103,7 @@ object StructOpter {
     // 2,3,210,2014/12/2
     // 3,1,300,2014/12/3
     // 3,1,310,2014/12/31
-    val edgeLines2 = sc.textFile("hdfs://S7SA053:8020/stat/edgegroup.csv")
+    val edgeLines2 = sc.textFile("file/data/graph/edgegroup.csv")
     val e2 = edgeLines2.map(line =>{
       val cols = line.split(",")
       Edge(cols(0).toLong,cols(1).toLong,(cols(2).trim.toLong,format.parse(cols(3))))

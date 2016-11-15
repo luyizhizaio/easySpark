@@ -1,5 +1,6 @@
 package com.graph
 
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.{SparkContext, SparkConf}
 
@@ -11,12 +12,13 @@ object GraphPregel9 {
 
 
   def main(args: Array[String]) {
-
+    Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
+    Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.ERROR);
 
     val conf = new SparkConf().setAppName("pregel").setMaster("local")
     val sc = new SparkContext(conf)
 
-    var graph = GraphLoader.edgeListFile(sc,"hdfs://S7SA053:8020/stat/web-Google.txt")
+    var graph = GraphLoader.edgeListFile(sc,"file/data/graph/web-Google.txt")
 
     val sourceId = 0
 
