@@ -3,7 +3,7 @@ package com.sparksql
 
 import breeze.linalg.{sum, min, max}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{Column, SQLContext}
 import org.apache.spark.{SparkContext, SparkConf}
 
 /**
@@ -51,6 +51,9 @@ object DataFrameAndGraph {
 df.agg(max($"age"), avg($"salary"))
 df.groupBy().agg(max($"age"), avg($"salary"))
      */
+
+    val c = person("age")+ 10
+    println(c)
 
 //2.Map参数
     //df.agg(Map("age" -> "max", "salary" -> "avg"))
