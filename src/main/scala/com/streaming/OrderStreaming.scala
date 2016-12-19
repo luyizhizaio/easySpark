@@ -3,6 +3,7 @@ package com.streaming
 import java.util
 
 import com.alibaba.fastjson.JSON
+import com.streaming.utils.RiskDateUtil
 import kafka.serializer.StringDecoder
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.SQLContext
