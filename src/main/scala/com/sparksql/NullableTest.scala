@@ -50,7 +50,13 @@ object NullableTest {
 
     val df4 = df3.selectExpr("name" ,"case when id is null then 0 else id end as id ")
     df4.show()
-
+//    +-------+---+
+//    |   name| id|
+//    +-------+---+
+//    |Michael|  0|
+//      |   Andy| 31|
+//      |  Flank|  0|
+//      +-------+---+
     sc.stop()
 
 
