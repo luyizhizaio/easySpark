@@ -1,11 +1,13 @@
 package com.ml.one.TransformerAndEstimaterAndPipeline
+
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.evaluation.BinaryClassificationEvaluator
 import org.apache.spark.ml.feature.{HashingTF, Tokenizer}
 import org.apache.spark.ml.tuning.{ParamGridBuilder, CrossValidator}
 import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{SQLContext, Row}
 
 /**
  * Created by lichangyue on 2017/1/3.
@@ -14,6 +16,9 @@ object MyEvaluator {
 
 
   def main(args: Array[String]) {
+    val conf = new SparkConf ()
+    val sc = new SparkContext(conf)
+    val sqlContext = new SQLContext(sc)
     // Prepare training data from a list of (id, text, label) tuples.
     //准备训练数据，id 内容，标签
     val training = sqlContext.createDataFrame(Seq(

@@ -1,9 +1,11 @@
 package com.ml.one.TransformerAndEstimaterAndPipeline
+
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.feature.{HashingTF, Tokenizer}
 import org.apache.spark.mllib.linalg.Vector
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{SQLContext, Row}
 /**
  * Created by lichangyue on 2017/1/3.
  */
@@ -11,6 +13,9 @@ object MyPipeline {
 
   def main(args: Array[String]) {
 
+    val conf = new SparkConf ()
+    val sc = new SparkContext(conf)
+    val sqlContext = new SQLContext(sc)
     // Prepare training documents from a list of (id, text, label) tuples.
     //准备训练文档，（id，内容，标签）
     val training = sqlContext.createDataFrame(Seq(

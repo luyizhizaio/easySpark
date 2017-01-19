@@ -1,4 +1,7 @@
 package com.ml.extractAndtransformerAndSelect
+
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.ml.feature.Word2Vec
 /**
  * Created by lichangyue on 2017/1/3.
@@ -7,7 +10,9 @@ object MyWord2Vct {
 
   def main(args: Array[String]) {
 
-
+    val conf = new SparkConf ()
+    val sc = new SparkContext(conf)
+    val sqlContext = new SQLContext(sc)
 
     // Input data: Each row is a bag of words from a sentence or document.
     //输入数据:每一行是一个单词集合，来自一句话或一个文档

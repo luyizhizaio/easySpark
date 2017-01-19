@@ -1,8 +1,10 @@
 package com.ml.one.TransformerAndEstimaterAndPipeline
+
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.ml.classification.LogisticRegression
 import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.mllib.linalg.{Vector, Vectors}
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{SQLContext, Row}
 /**
  * Created by lichangyue on 2017/1/3.
  */
@@ -11,7 +13,9 @@ object MyTransformer {
 
   def main(args: Array[String]) {
 
-
+    val conf = new SparkConf ()
+    val sc = new SparkContext(conf)
+    val sqlContext = new SQLContext(sc)
     // Prepare training data from a list of (label, features) tuples.
     //准备带标签和特征的数据
     val training = sqlContext.createDataFrame(Seq(

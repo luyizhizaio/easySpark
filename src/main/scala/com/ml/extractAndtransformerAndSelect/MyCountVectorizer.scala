@@ -1,5 +1,9 @@
 package com.ml.extractAndtransformerAndSelect
+
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel}
+import org.apache.spark.sql.SQLContext
+
 /**
  * Created by lichangyue on 2017/1/3.
  */
@@ -8,8 +12,9 @@ object MyCountVectorizer {
 
   def main(args: Array[String]) {
 
-
-
+    val conf = new SparkConf ()
+    val sc = new SparkContext(conf)
+    val sqlContext = new SQLContext(sc)
 
     val df = sqlContext.createDataFrame(Seq(
       (0, Array("a", "b", "c")),

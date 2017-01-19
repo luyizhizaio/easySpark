@@ -11,8 +11,6 @@ object SparkTest {
 
 
   def main(args: Array[String]) {
-    Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
-    Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.ERROR);
 
    /* val conf = new SparkConf().setMaster("local").setAppName(this.getClass().getSimpleName().filter(!_.equals('$')))
     val sc = new SparkContext(conf)
@@ -48,14 +46,45 @@ object SparkTest {
 
     println(set.size)*/
 
-    val conf = new SparkConf().setAppName(this.getClass.getSimpleName).setMaster("local")
+    /*val conf = new SparkConf().setAppName(this.getClass.getSimpleName).setMaster("local")
       .set("spark.network.timeout", "99999s").set("spark.executor.heartbeatInterval", "99999s")
 
     val sc = new SparkContext(conf)
 
     val x = sc.parallelize(List(Set("a"), Set("b"), Set("c", "d")))
 
-    x.flatMap(y=>y).foreach(a => println(a))
+    x.flatMap(y=>y).foreach(a => println(a))*/
+
+
+
+      val conf = new SparkConf().setAppName("test").setMaster("local")
+
+      val sc = new  SparkContext(conf)
+
+     /* val rdd = sc.parallelize(List(1,2,3))
+
+      val num = rdd.map(x =>x +1).reduce(_+_)
+
+      println(num)*/
+
+    val rdd = sc.textFile("file/temp/time.txt")
+    rdd.map(line =>{
+      //20-10月-16 03.25.15.000000 下午
+      var arr = line.split(" ")
+      var datearr = arr(0).split("-") //20-10月-16
+      var date = "20" + datearr(2) +"-" + datearr(1).substring(0,datearr(1).length-1) +"-"+ datearr(0)
+      var timearr = arr(1).split("\\.")
+      var ampm =  arr(2)
+      var hour = timearr(0)
+      if("下午".equals(ampm)){
+        hour = (timearr(0).toInt + 12).toString
+      }
+      var time = hour + ":" + timearr(1) + ":" + timearr(2)
+      date +" "+ time
+//      val date = "2016-11-09 00:00:00"
+
+
+    }).foreach(println)
 
   }
 

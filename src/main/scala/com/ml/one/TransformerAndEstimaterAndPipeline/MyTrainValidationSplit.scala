@@ -1,4 +1,7 @@
 package com.ml.one.TransformerAndEstimaterAndPipeline
+
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.ml.evaluation.RegressionEvaluator
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
@@ -8,7 +11,9 @@ import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
 object MyTrainValidationSplit {
 
   def main(args: Array[String]) {
-
+    val conf = new SparkConf ()
+    val sc = new SparkContext(conf)
+    val sqlContext = new SQLContext(sc)
     // Prepare training and test data.
     //准备训练数据和测试数据
     val data = sqlContext.read.format("libsvm").load("data/mllib/sample_linear_regression_data.txt")

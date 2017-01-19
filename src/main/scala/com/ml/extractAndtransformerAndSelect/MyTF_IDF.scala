@@ -1,4 +1,7 @@
 package com.ml.extractAndtransformerAndSelect
+
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.{SparkContext, SparkConf}
 import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
 /**
  * Created by lichangyue on 2017/1/3.
@@ -8,7 +11,9 @@ object MyTF_IDF {
   def main(args: Array[String]) {
 
 
-
+    val conf = new SparkConf ()
+    val sc = new SparkContext(conf)
+    val sqlContext = new SQLContext(sc)
     val sentenceData = sqlContext.createDataFrame(Seq(
       (0, "Hi I heard about Spark"),
       (0, "I wish Java could use case classes"),
