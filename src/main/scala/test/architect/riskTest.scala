@@ -1,4 +1,4 @@
-package test.gome.architect
+package test.architect
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx.{EdgeDirection, Graph, Edge}

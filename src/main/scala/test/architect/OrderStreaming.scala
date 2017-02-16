@@ -1,4 +1,4 @@
-package test.gome.architect
+package test.architect
 
 import java.util.Date
 

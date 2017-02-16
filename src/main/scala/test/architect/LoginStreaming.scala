@@ -1,4 +1,4 @@
-package test.gome.architect
+package test.architect
 
 import com.alibaba.fastjson.JSON
 import kafka.api.{OffsetRequest, PartitionOffsetRequestInfo, TopicMetadataRequest}
