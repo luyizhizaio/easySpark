@@ -74,6 +74,7 @@
                 <artifactId>kafka-spark-consumer</artifactId>
                 <version>1.0.8</version>
             </dependency>-->
+        <!-- kafka +spark 使用包 -->
         <dependency>
             <groupId>kafka.spark.consumer</groupId>
             <artifactId>kafka-spark-consumer</artifactId>
