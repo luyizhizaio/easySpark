@@ -2,6 +2,7 @@ package com.mllib
 
 import breeze.linalg.sum
 import org.apache.spark.graphx.lib.LabelPropagation
+import org.apache.spark.mllib.evaluation.MulticlassMetrics
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression.{LinearRegressionWithSGD, LabeledPoint}
 import org.apache.spark.rdd.RDD
@@ -18,6 +19,8 @@ object LinearRegrTest {
     val conf=new SparkConf().setAppName("regression").setMaster("local[1]")
     val sc=new SparkContext(conf)
 
+//    1,2011-01-01,1,0,1,0,0,6,0,1,0.24,0.2879,0.81,0,3,13,16
+//    2,2011-01-01,1,0,1,1,0,6,0,1,0.22,0.2727,0.8,0,8,32,40
     val records=sc.textFile("data/mllib/hour.csv").map(_.split(",")).cache()
 
 
@@ -48,7 +51,7 @@ object LinearRegrTest {
 
         LabeledPoint(label , Vectors.dense(features))
     }
-    val categoricalFeaturesInfo = Map[Int,Int]()
+    //val categoricalFeaturesInfo = Map[Int,Int]()
 
     /**
      * 返回模型
@@ -58,7 +61,7 @@ object LinearRegrTest {
     val linear_model = LinearRegressionWithSGD.train(data,10,0.5)
 
     //预测结果
-    val true_vs_predicted = data.map(p => (p.label, linear_model.predict(p.features)))
+    val true_vs_predicted = data.map(p => (linear_model.predict(p.features) ,p.label))
 
     println(true_vs_predicted.take(5).toVector.toString())
 
