@@ -22,7 +22,7 @@ object TestNaiveBayes {
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
 
-    var srcRDD = sc.textFile("hdfs://S7SA053:8020/stat/sougou/").map(x =>{
+    var srcRDD = sc.textFile("data/mllib/sougou-train/*").map(x =>{
       val data = x.split(",")
       RawDataRecord(data(0),data(1)) //返回结果
     })
@@ -30,25 +30,26 @@ object TestNaiveBayes {
     val splits= srcRDD.randomSplit(Array(0.7,0.3))
     var trainingDF = splits(0).toDF()  //转成DataFrame
     var testDF = splits(1).toDF()
+
     //将词语转成数组
     var tokenizer = new Tokenizer().setInputCol("text").setOutputCol("words")
     var wordsData = tokenizer.transform(trainingDF)
     println("output1:")
-    wordsData.select($"category",$"text",$"words").take(1)
+    wordsData.select($"category",$"text",$"words").take(1).foreach(println)
 
     //计算每个词在文档中的词频
     var hashingTF = new  HashingTF().setNumFeatures(500000).setInputCol("words").setOutputCol("rawFeatures")
     var featureizedData = hashingTF.transform(wordsData) //转成词频
     println("output2:")
 
-    featureizedData.select($"category",$"words",$"rawFeatures").take(1)
+    featureizedData.select($"category",$"words",$"rawFeatures").take(1).foreach(println)
 
     //计算每个词的TF-IDF
     var idf = new IDF().setInputCol("rawFeatures").setOutputCol("features")
     var idfModel = idf.fit(featureizedData)
     var rescaledData = idfModel.transform(featureizedData)
     println("output3:")
-    rescaledData.select($"category",$"features").take(1)
+    rescaledData.select($"category",$"features").take(1).foreach(println)
 
     //转成bayes的输入格式
     var trainDataRdd = rescaledData.select($"category",$"features").map{
@@ -56,12 +57,12 @@ object TestNaiveBayes {
         LabeledPoint(label.toDouble,Vectors.dense(features.toArray))
     }
     println("output4:")
-    trainDataRdd.take(1)
+    trainDataRdd.take(1).foreach(println)
 
     //训练模型
     val model = NaiveBayes.train(trainDataRdd,lambda = 1.0,modelType="multinomial")
-    //测试数据集，做同样的特征表示及格式转换
 
+    //测试数据集，做同样的特征表示及格式转换
     var testwordsData = tokenizer.transform(testDF)
     var testFeaturizedData = hashingTF.transform(testwordsData)
     var testRescaledData = idfModel.transform(testFeaturizedData)
@@ -72,7 +73,7 @@ object TestNaiveBayes {
 
 
 
-    //对测试数据集使用训练模型进行分类预测,对模型进行校验
+    //预测：对测试数据集使用训练模型进行分类预测,对模型进行校验
     val testpredictionAndLabel = testDataRdd.map(p=>(model.predict(p.features),p.label))
 
     //统计分类的准确率
