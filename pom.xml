@@ -80,6 +80,20 @@
             <artifactId>kafka-spark-consumer</artifactId>
             <version>1.0.8</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-client</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.github.nscala-time/nscala-time_2.10 -->
+        <dependency>
+            <groupId>com.github.nscala-time</groupId>
+            <artifactId>nscala-time_2.10</artifactId>
+            <version>0.2.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <!-- maven官方 http://repo1.maven.org/maven2/  或 http://repo2.maven.org/maven2/ （延迟低一些） -->
@@ -96,6 +110,10 @@
         <repository>
             <id>SparkPackagesRepo</id>
             <url>http://dl.bintray.com/spark-packages/maven</url>
+        </repository>
+        <repository>
+            <id>nscala-time</id>
+            <url>https://mvnrepository.com/artifact/com.github.nscala-time/nscala-time_2.10</url>
         </repository>
     </repositories>
 
