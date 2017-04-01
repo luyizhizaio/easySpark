@@ -295,7 +295,7 @@ object RunKmeansTest {
     val clustersAndLabels = labelsAndClusters.map(_.swap) //swap交换元组的两个元素label
 
     //相同的簇包含哪些标签
-    // groupByKey将RDD[K,V]中每个K对应的V值，合并到一个集合Iterable[V]中，
+    // groupByKey将RDD[K,V]中每个K对应的V值合并到一个集合Iterable[V]中，
     val labelsInCluster = clustersAndLabels.groupByKey().values  //返回Iterable[label]
 
     //groupBy 根据标签分成多个子集合
