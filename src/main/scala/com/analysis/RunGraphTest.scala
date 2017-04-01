@@ -6,7 +6,7 @@ import java.security.MessageDigest
 import com.analysis.common.XmlInputFormat
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.io.{Text, LongWritable}
-import org.apache.spark.graphx.{VertexRDD, VertexId, Graph, Edge}
+import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -76,6 +76,8 @@ object RunGraphTest {
       Edge(ids(0),ids(1),cnt)
     })
 
+    println("边的数量:"+edges.count())
+
     val topicGraph = Graph(vertices,edges)
     topicGraph.cache()
 
@@ -117,11 +119,62 @@ object RunGraphTest {
     //卡方统计量大则表明随机变量相互独立的可能性小，因此两个概念同时出现是有意义的。
 
     val T = medline.count() //论文的数量
-    //计算主题的数量
+    //计算每个主题的数量
     val topicCountRdd = topics.map(x =>(hashId(x),1)).reduceByKey(_+_)
 
+    //构建新图，顶点的属性是主题数量 ，
+    val topicCountGraph = Graph(topicCountRdd,topicGraph.edges)
+
+    /*现在我们拥有计算topicCountGraph 中每条边的卡方统计量所需的所有信息。计算卡方统
+    计量，需要组合顶点数据（比如每个概念在一个文档中出现的次数）和边数据（比如两
+    个概念同时出现在一个文档中的次数）*/
+
+    val  chiSquaredGraph = topicCountGraph.mapTriplets(triplet =>{
+      //triplet.attr两个主题同时出现的数量
+      chiSq(triplet.attr,triplet.srcAttr,triplet.dstAttr,T)
+    })
+
+    //计算卡方统计量
+    println(chiSquaredGraph.edges.map(x => x.attr).stats())
+
+    //计算百分位
+    println ("99% percent:"+percentile(chiSquaredGraph.edges.map(x => x.attr),0.99))
+
+    //根据属性过滤
+    val interesting = chiSquaredGraph.subgraph(triplet => triplet.attr > 19.5)
+
+    println(interesting.edges.count())
 
 
+    //分析去掉噪声边的子图
+
+    //先在子图上运行连通组件算法，并检查组件个数和组件大小
+    val interestingComponentCounts= sortedConnectedComponents(interesting.connectedComponents())
+
+    println(interestingComponentCounts.size)
+    interestingComponentCounts.take(10).foreach(println)
+
+
+    //查看度的分布
+    val interestingDegrees = interesting.degrees.cache
+    println("度的统计量:"+interestingDegrees.map(_._2).stats())
+//    (count: 7587, mean: 9.737446, stdev: 10.637843, max: 247.000000, min: 1.000000)
+    //查看主题和度的关系
+    topNamesAndDegrees(interestingDegrees,topicGraph).foreach(println)
+
+    //计算平均局部聚类系数
+    val avgCC =avgClusteringCoef(interesting)
+    println("平均局部聚类系数："+ avgCC)
+
+    //计算顶点的平均路径
+    val paths = samplePathLengths(interesting)
+
+    println("路径统计量：" + paths.map(_._3).filter(_ > 0).stats())
+
+    //计算直方图。值的数量
+    val hist = paths.map(_._3).countByValue()
+    println("路径长度的直方图：")
+    hist.toSeq.sorted.foreach(println)
 
 
 
@@ -129,6 +182,119 @@ object RunGraphTest {
     sc.stop()
 
   }
+
+
+  def samplePathLengths[V,E](graph: Graph[V,E] , fraction: Double = 0.02)
+    :RDD[(VertexId,VertexId,Int)] ={
+
+    val replacement = false
+    //顶点的样本
+    val sample = graph.vertices.map(v => v._1).sample(
+    replacement,fraction, 1729L)
+    val ids = sample.collect.toSet
+
+    //修改顶点属性值
+    val mapGraph = graph.mapVertices((id,v) =>{
+      if(ids.contains(id)){
+        Map(id->0)
+      }else {
+        Map[VertexId,Int]()
+      }
+    })
+
+    //开始消息
+    val start = Map[VertexId,Int]()
+
+    val res = mapGraph.ops.pregel(start)(update,iterate,mergeMaps)
+    res.vertices.flatMap{case (id,m)=>
+        m.map{case (k,v)=>
+          if (id < k ){
+            (id,k ,v)
+          }else{
+            (k,id,v)
+          }
+        }
+    }.distinct().cache()
+  }
+
+  def mergeMaps(m1:Map[VertexId,Int],m2: Map[VertexId,Int]):Map[VertexId,Int] = {
+    def minThatExists(k:VertexId) :Int ={
+      math.min(
+        m1.getOrElse(k,Int.MaxValue),
+        m2.getOrElse(k,Int.MaxValue))
+    }
+    (m1.keySet ++ m2.keySet).map{
+      k => (k , minThatExists(k))
+    }.toMap
+  }
+  def checkIncrement(a: Map[VertexId, Int], b: Map[VertexId, Int], bid: VertexId)
+  : Iterator[(VertexId, Map[VertexId, Int])] = {
+    val aplus = a.map { case (v, d) => v -> (d + 1) }
+    if (b != mergeMaps(aplus, b)) {
+      Iterator((bid, aplus))
+    } else {
+      Iterator.empty
+    }
+  }
+
+  def iterate(e: EdgeTriplet[Map[VertexId, Int], _]): Iterator[(VertexId, Map[VertexId, Int])] = {
+    checkIncrement(e.srcAttr, e.dstAttr, e.dstId) ++
+      checkIncrement(e.dstAttr, e.srcAttr, e.srcId)
+  }
+
+  def update(id:VertexId,state:Map[VertexId,Int],msg:Map[VertexId,Int])
+    :Map[VertexId,Int] = {
+    mergeMaps(state,msg)
+  }
+
+  /**
+   * 计算过滤后的概念图的每个节点的局部聚类系数
+   * @param graph
+   * @return
+   */
+  def avgClusteringCoef(graph :Graph[_,_]):Double ={
+
+    val triCountGraph = graph.triangleCount() //顶点属性是三角数量
+    println("三角形数量统计量：" + triCountGraph.vertices.map(x => x._2).stats())
+//    (count: 7699, mean: 12.090012, stdev: 20.929016, max: 692.000000, min: 0.000000)
+//    每个顶点可能的三角计数
+    val maxTrisGraph = graph.degrees.mapValues(d => d * (d -1) / 2.0)
+    val clusterCoefGraph = triCountGraph.vertices.innerJoin(maxTrisGraph){
+       //局部聚类系数
+      (vertexId, triCount, maxTris) =>if(maxTris == 0) 0 else triCount / maxTris
+    }
+    //对图中所有顶点局部聚类系数取平均值，就得到网络平均聚类系数
+    clusterCoefGraph.map(_._2).sum() / graph.vertices.count()
+  }
+
+
+  /**
+   * 计算百分位
+   */
+  def percentile(rdd:RDD[Double],percentile: Double) = {
+    val num =  rdd.count() * (1 - percentile)
+    rdd.sortBy(x =>x, false).take(num.toInt).last
+  }
+
+
+  /**
+   * 计算卡方检验
+   * @param YY
+   * @param YB
+   * @param YA
+   * @param T
+   * @return
+   */
+ def chiSq(YY:Int,YB:Int,YA:Int,T:Long):Double ={
+
+    val NB = T - YB
+    val NA = T - YA
+    val YN= YA - YY
+    val NY = YB - YY
+    val NN= T - NY - YN - YY
+    val  inner = (YY*NN - YN*NY) - T/ 2.0
+    T * math.pow(inner,2) /(YA * NA * YB * NB)  //pow开方
+ }
 
   def topNamesAndDegrees(degrees:VertexRDD[Int],topicGraph:Graph[String,Int])
   : Array[(String,Int)] ={
