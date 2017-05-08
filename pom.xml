@@ -63,11 +63,11 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.6</version>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
             <version>2.2</version>
-        </dependency>
+        </dependency>-->
 
             <!--<dependency>
                 <groupId>dibbhatt</groupId>
@@ -75,23 +75,24 @@
                 <version>1.0.8</version>
             </dependency>-->
         <!-- kafka +spark 使用包 -->
-        <dependency>
+        <!--<dependency>
             <groupId>kafka.spark.consumer</groupId>
             <artifactId>kafka-spark-consumer</artifactId>
             <version>1.0.8</version>
-        </dependency>
+        </dependency>-->
 
-        <dependency>
+       <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
+           <version>2.7.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.github.nscala-time/nscala-time_2.10 -->
-        <dependency>
+        <!--<dependency>
             <groupId>com.github.nscala-time</groupId>
             <artifactId>nscala-time_2.10</artifactId>
             <version>0.2.0</version>
-        </dependency>
+        </dependency>-->
 
 
     </dependencies>
@@ -115,6 +116,11 @@
             <id>nscala-time</id>
             <url>https://mvnrepository.com/artifact/com.github.nscala-time/nscala-time_2.10</url>
         </repository>
+        <repository>
+            <id>json</id>
+            <url>https://mvnrepository.com/artifact/com.alibaba/fastjson</url>
+        </repository>
+
     </repositories>
 
     <build>
