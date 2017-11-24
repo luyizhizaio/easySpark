@@ -1,4 +1,4 @@
-package test.architect
+package com.sparkstreaming
 
 /**
  * Created by lichangyue on 2017/2/14.

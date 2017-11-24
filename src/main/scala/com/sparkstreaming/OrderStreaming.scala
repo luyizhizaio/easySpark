@@ -1,4 +1,4 @@
-package test.architect
+package com.sparkstreaming
 
 import java.util.Date
 

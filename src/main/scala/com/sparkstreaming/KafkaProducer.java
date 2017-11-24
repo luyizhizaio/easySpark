@@ -1,4 +1,4 @@
-package test.architect;
+package com.sparkstreaming;
 
 import com.alibaba.fastjson.JSON;
 import kafka.javaapi.producer.Producer;
