@@ -8,7 +8,7 @@ import org.apache.spark.{SparkContext, SparkConf}
  * 求出二度节点的数量
  * Created by lichangyue on 2016/11/15.
  */
-object TwoDegreeGraph4tengxun {
+object TwoDegreeGraph4UsingAggregateMessage {
 
 
 
