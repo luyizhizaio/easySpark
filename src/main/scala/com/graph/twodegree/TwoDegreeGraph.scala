@@ -1,16 +1,14 @@
-package com.graph.usingCase
+package com.graph.twodegree
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
-import org.apache.spark.{SparkConf, SparkContext}
-
+import org.apache.spark.{SparkContext, SparkConf}
 import scala.collection.mutable.HashMap
-
 /**
  * 参考地址：http://kubicode.me/2015/07/07/Spark/Graphs-Applications/#
  * Created by lichangyue on 2016/10/12.
  */
-object TwoDegreeGraph2 {
+object TwoDegreeGraph {
 
   def main(args: Array[String]) {
     Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
@@ -21,10 +19,13 @@ object TwoDegreeGraph2 {
     val sc = new SparkContext(conf)
 
 
+   /* val edge=List(//边的信息
+      (111,122),(111,133),(122,133),(133,144),(133,155),(133,166),
+      (144,155),(155,166),(177,188),(177,199),(188,199))*/
 
     val edge=List(//边的信息
-      (1,2),(1,3),(2,3),(3,4),(3,5),(3,6),
-      (4,5),(5,6),(7,8),(7,9),(8,9))
+      (111,122),(111,133),(122,133),(133,144),(133,155),(133,116),
+      (144,155),(155,116),(177,188),(177,199),(188,199))
 
 
     //构建边的rdd
@@ -88,39 +89,44 @@ object TwoDegreeGraph2 {
 
 
     newG.vertices.collect().foreach(println(_))
-//    (4,Map(5 -> 1, 1 -> 0, 6 -> 0, 2 -> 0, 3 -> 1, 4 -> 2))
+    //(4,Map(5 -> 1, 1 -> 0, 6 -> 0, 2 -> 0, 3 -> 1, 4 -> 2))
 //    (1,Map(5 -> 0, 1 -> 2, 6 -> 0, 2 -> 1, 3 -> 1, 4 -> 0))
 //    (6,Map(5 -> 1, 1 -> 0, 6 -> 2, 2 -> 0, 3 -> 1, 4 -> 0))
-//    (3,Map(5 -> 1, 1 -> 1, 6 -> 1, 2 -> 1, 3 -> 2, 4 -> 1))
-//    (7,Map(7 -> 2, 8 -> 1, 9 -> 1))
-//    (9,Map(9 -> 2, 7 -> 1, 8 -> 1))
-//    (8,Map(8 -> 2, 7 -> 1, 9 -> 1))
-//    (5,Map(5 -> 2, 1 -> 0, 6 -> 1, 2 -> 0, 3 -> 1, 4 -> 1))
-//    (2,Map(5 -> 0, 1 -> 1, 6 -> 0, 2 -> 2, 3 -> 1, 4 -> 0))
 
 
-
-    //过滤得到二跳邻居 就是value=0 的顶点
-    val twoJumpFirends=newG.vertices.mapValues(_.filter(_._2==0).keys)
-
-
-
-    //打印二跳节点
-    twoJumpFirends.collect().foreach(println(_))
-//    (4,Set(1, 6, 2))
-//    (1,Set(5, 6, 4))
-//    (6,Set(1, 2, 4))
-//    (3,Set())
-//    (7,Set())
-//    (9,Set())
-//    (8,Set())
-//    (5,Set(1, 2))
-//    (2,Set(5, 6, 4))
+    println("--------------------")
+    //进行顶点ID,和对应属性id的判断  转成 类型，数量 , 再过滤
+    val newG2  = newG.mapVertices((id,attr) =>{
+      var map = attr.filter{case (k,v) =>  v == 0 }
+      var tpMap = new HashMap[String,Int];
+      map.keys.foreach(key=> {
+        val tp = key.toString.substring(0,2)
+        tpMap(tp) = tpMap.getOrElse(tp,0) + 1
+      })
+      tpMap
+    })
 
 
+    newG2.vertices.collect().foreach(println(_))
+//    (122,Map(15 -> 1, 14 -> 1, 11 -> 1))
+//    (116,Map(12 -> 1, 14 -> 1, 11 -> 1))
+//    (111,Map(15 -> 1, 14 -> 1, 11 -> 1))
+//    (188,Map())
+//    (133,Map())
+//    (144,Map(12 -> 1, 11 -> 2))
+//    (199,Map())
+//    (155,Map(12 -> 1, 11 -> 1))
+//    (177,Map())
 
 
+     //过滤14
+    val rdd = newG2.vertices.filter{case(id,attr) => id.toString.substring(0,2).equals("14")}
+      .map(line => {
+      line._1 +","+line._2.getOrElse("11",0)
+    })
 
+    rdd.collect().foreach(println)
+    //144,2
 
   }
 

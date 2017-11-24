@@ -1,4 +1,4 @@
-package com.graph.usingCase
+package com.graph.twodegree
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx.{EdgeDirection, VertexId, Graph}
