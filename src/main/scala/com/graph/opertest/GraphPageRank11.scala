@@ -1,4 +1,4 @@
-package com.graph
+package com.graph.opertest
 
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.{SparkContext, SparkConf}

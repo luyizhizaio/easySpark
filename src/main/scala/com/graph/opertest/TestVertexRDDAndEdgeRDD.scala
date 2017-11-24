@@ -1,11 +1,11 @@
-package com.graph
+package com.graph.opertest
 
 import java.text.SimpleDateFormat
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * Created by lichangyue on 2016/9/18.

@@ -1,13 +1,13 @@
-package com.graph
+package com.graph.opertest
 
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.graphx.{Graph, Edge}
-import org.apache.spark.{SparkContext, SparkConf}
+import org.apache.spark.graphx.{Edge, Graph}
+import org.apache.spark.{SparkConf, SparkContext}
 
 /**
  * Created by lichangyue on 2016/12/14.
  */
-object TestSubGraph {
+object TestSubGraph2 {
 
   def main(args: Array[String]) {
     Logger.getLogger("org.apache.spark").setLevel(Level.ERROR);
