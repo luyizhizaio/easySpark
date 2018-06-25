@@ -67,7 +67,7 @@ object SparkTest {
 
       println(num)*/
 
-    val rdd = sc.textFile("file/temp/time.txt")
+    val rdd = sc.textFile("data/temp/time.txt")
     rdd.map(line =>{
       //20-10月-16 03.25.15.000000 下午
       var arr = line.split(" ")
