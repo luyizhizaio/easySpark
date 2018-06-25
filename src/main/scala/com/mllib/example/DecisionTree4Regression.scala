@@ -1,4 +1,4 @@
-package com.example
+package com.mllib.example
 
 import org.apache.spark.mllib.tree.DecisionTree
 import org.apache.spark.sql.SQLContext

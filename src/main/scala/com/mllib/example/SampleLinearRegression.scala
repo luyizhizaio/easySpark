@@ -1,4 +1,4 @@
-package com.example
+package com.mllib.example
 
 import org.apache.spark.ml.regression.LinearRegression
 import org.apache.spark.sql.SQLContext

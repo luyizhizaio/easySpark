@@ -1,4 +1,4 @@
-package com.example
+package com.mllib.example
 
 import org.apache.spark.mllib.tree.RandomForest
 import org.apache.spark.sql.SQLContext
