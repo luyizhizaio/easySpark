@@ -1,4 +1,4 @@
-package com.graph.suanfa
+package com.graph.algorithm
 
 /**
  * Created by lichangyue on 2016/12/21.

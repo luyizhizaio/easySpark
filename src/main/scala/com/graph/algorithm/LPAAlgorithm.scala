@@ -1,4 +1,4 @@
-package com.graph.suanfa
+package com.graph.algorithm
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.graphx.lib.LabelPropagation

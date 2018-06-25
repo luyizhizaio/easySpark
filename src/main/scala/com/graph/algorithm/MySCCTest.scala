@@ -1,4 +1,4 @@
-package com.graph.suanfa
+package com.graph.algorithm
 
 import org.apache.spark.graphx.GraphLoader
 import org.apache.spark.{SparkContext, SparkConf}
