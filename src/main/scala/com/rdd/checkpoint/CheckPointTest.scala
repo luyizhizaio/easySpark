@@ -28,6 +28,7 @@ object CheckPointTest {
     pairs.count()
 
     val result = pairs.groupByKey(2)
+    result.foreach(println(_))
     result.foreachWith(i=>i)((x,i) => println(s"[PartitionIndex: $i ] $x"))
 
     println(result.toDebugString)
