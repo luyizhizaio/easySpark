@@ -1,11 +1,11 @@
-package opensource
+package opensource.rdd.dependency
 
 import org.apache.spark.{SparkContext, SparkConf}
 
 /**
- * Created by Kyrie on 2019/3/14.
+ * Created by Kyrie on 2019/3/30.
  */
-object MainTest {
+object OneToOneDep {
 
   def main(args: Array[String]) {
 
@@ -21,13 +21,8 @@ object MainTest {
       val Array(k,v) = line.split(" ",2)
       k->v
     }
+    rdd2.count
 
-    val rdd3 = rdd2.reduceByKey(_+","+_)
-
-
-    val rdd4= rdd3.map{case(k,v) => k -> v.length}
-
-      rdd4.saveAsTextFile("data/temp/text.result")
 
   }
 
